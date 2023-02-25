@@ -1,8 +1,8 @@
 from .node import Node
 import numpy as np
-import numba as nb
+# import numba as nb
 
-@nb.njit
+# @nb.njit
 def add(operands: np.ndarray):
     return np.sum(operands)
 
@@ -10,5 +10,4 @@ def add(operands: np.ndarray):
 class Add(Node):
     def __init__(self):
         super().__init__(num_operands = 2, func = add)
-        
     

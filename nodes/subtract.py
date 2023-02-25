@@ -1,8 +1,10 @@
+
+
 from .node import Node
 import numpy as np
-import numba as nb
+# import numba as nb
 
-@nb.njit
+# @nb.njit
 def subtract(operands: np.ndarray):
     return operands[0] - operands[1]
 

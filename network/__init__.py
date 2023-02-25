@@ -1,0 +1,1 @@
+from ..nodes.setup_model import create_function_from_gene

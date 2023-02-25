@@ -1,2 +1,5 @@
-__pycache__
 *.gv
+*cache*
+*-info
+build
+dist
