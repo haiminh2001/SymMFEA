@@ -11,11 +11,17 @@ from SymMFEA.network import create_function_from_gene
 def test_decode():
     #Expression  +, −, cos, ∗, x,−, cos,+, y, x, x, x, x, y, x, y, x
     
+    def gt(x):
+        return (np.cos(x[0]) * 2 * x[0] - x[0] ) + np.cos(x[1] - x[0])
+    
     func = create_function_from_gene(np.array([[1, 2, 3, 4, 0, 2, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                                        [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ,0 ,1 ,0]                           
+                                               [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ,0 ,1 ,0]                           
                                         ]))
-    x = np.array([1, 2])
-    print(func(x))
+    
+    
+    for _ in range(100):
+        x = np.random.rand(2)
+    
+        assert func(x) == gt(x)
 
-test_decode()
 

@@ -8,11 +8,11 @@ def create_function_from_gene(gene: np.ndarray):
     
     
     root = get_node(gene[0,0])()
-    stack: List[Node] = [root]
+    queue: List[Node] = [root]
     idx = 1
     #get head
-    while len(stack):
-        cur_node = stack[0]
+    while len(queue):
+        cur_node = queue[0]
         
         if cur_node.is_operand:
             pass
@@ -30,13 +30,14 @@ def create_function_from_gene(gene: np.ndarray):
                 #if is operator
                 else:
                     node = get_node(node_type)()
-                    stack.append(node)
+                    queue.append(node)
 
                 children.append(node)
+                idx += 1
                 
             cur_node.add_children(children)
         
-        idx += 1
-        stack.pop(0)
+        
+        queue.pop(0)
             
     return root

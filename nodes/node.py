@@ -8,11 +8,14 @@ class Node:
         self.is_operand: bool = is_operand
         
     def add_children(self, children: List[Node]):
+        assert len(children) == self.num_operands
         self.children: List[Node] = children
         
     
     def __call__(self, x):
-        if self.num_operands < 2:
+        if self.num_operands < 1:
             return self.func(x)
+        elif self.num_operands == 1:
+            return self.func(self.children[0](x))
         else:
             return self.func(np.array([child(x) for child in self.children]))
