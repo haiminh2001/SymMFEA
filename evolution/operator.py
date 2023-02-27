@@ -6,22 +6,23 @@ from typing import List, Optional
 class Operator:
     def __init__(
         self, lower_bound: Optional[List[int]], upper_bound: Optional[List[int]]
-    ):
+    ):  
         self.lb = lower_bound
         self.ub = upper_bound
+        
 
     def uniform_crossover(self, population):
 
         # extract parameters
-        N, D = population.shape
+        N, _, D = population.shape
 
         # select for crossover
         parent1 = population[np.random.permutation(N), :]
         parent2 = population[np.random.permutation(N), :]
-        offspring = np.zeros([N, D])
+        offspring = np.zeros([N, 2, D])
 
         # create random variable
-        r = np.random.rand(N, D)
+        r = np.random.rand(N, 2, D)
 
         # uniform crossover
         index = r >= 0.5
@@ -34,13 +35,13 @@ class Operator:
     def mutate(self, offspring):
 
         # extract parameters
-        N, D = offspring.shape
+        N, _, D = offspring.shape
 
         # create random variable
-        r = np.random.rand(N, D)
-
+        r = np.random.rand(*list(offspring.shape))
         # mutate with p=1/D
         index = r < 1.0 / float(D)
+        
         offspring[index] = np.random.randint(
             low=self.lb, high=self.ub, size=offspring.shape
         )[index]
@@ -50,17 +51,16 @@ class Operator:
     def select(self, population, fitness, offspring, offspring_fitness):
 
         # extract parameters
-        N, D = population.shape
+        N, _, D = population.shape
 
         # concat
         inter_population = np.concatenate([population, offspring], axis=0)
         inter_fitness = np.concatenate([fitness, offspring_fitness], axis=0)
 
         # sort
-        index = np.argsort(-inter_fitness)
-
+        index = np.argsort(np.ravel(-inter_fitness))
         # select
-        population = inter_population[index[:N], :]
+        population = inter_population[index[:N]]
         fitness = inter_fitness[index[:N]]
 
         return population, fitness
@@ -96,7 +96,7 @@ def dominance_test(solution1_objs, solution2_objs) -> int:
 class MultiObjectiveOperator(Operator):
     @staticmethod
     def compute_ranking(population, objs):
-        N, D = population.shape
+        N, _, _ = population.shape
 
         # number of solutions dominating solution ith
         dominating_ith = [0 for _ in range(N)]
@@ -198,7 +198,7 @@ class MultiObjectiveOperator(Operator):
     def select(self, population, objs, offspring, offspring_objs):
 
         # extract parameters
-        N, D = population.shape
+        N, _, _ = population.shape
 
         # concat
         inter_population = np.concatenate([population, offspring], axis=0)
