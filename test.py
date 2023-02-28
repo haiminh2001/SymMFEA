@@ -8,7 +8,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     
     parser.add_argument("--num_operators", default=20, type=int)
-    parser.add_argument("--num_operands", default=40, type=int)
+    parser.add_argument("--num_operands", default=100, type=int)
     parser.add_argument("--seed", type=int, default=42)
     parser = Optimizer.add_optimizer_specific_args(parser)
     
@@ -31,7 +31,7 @@ def parse_args():
 
 def main():
     args = parse_args()
-    problem = ToyProblem()
+    problem = ToyProblem(seed = args.seed)
     
     
     optimizer = Optimizer(args)

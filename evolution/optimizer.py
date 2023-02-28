@@ -56,6 +56,7 @@ class Optimizer:
             population, fitness = self.operator.select(
                 population, fitness, offspring, offspring_fitness
             )
+                
 
             # # save checkpoint
             # Optimizer.save_checkpoint(t, population, fitness, self.save_dict_path)

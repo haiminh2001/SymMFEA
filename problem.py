@@ -22,18 +22,19 @@ class Problem:
         return self.X.shape[1]
     
 
-    def evaluate(self, gene):
+    def evaluate(self, gene, is_print = False):
         function = create_function_from_gene(gene) 
         
         
         y_hat = np.array([function(x) for x in self.X])
-        
+        if is_print:
+            print(y_hat[:10], self.y[:10])
         return -self.eval_func(self.y, y_hat)
     
     
 class ToyProblem(Problem):
-    def __init__(self, eval_func: Callable = MAPE):
-        X, y = make_regression()
+    def __init__(self, eval_func: Callable = MAPE, seed = 42):
+        X, y = make_regression(random_state = seed)
         super().__init__(X, y, eval_func)
         
     
