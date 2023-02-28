@@ -1,5 +1,5 @@
 from sklearn.datasets import make_regression
-from sklearn.metrics import mean_absolute_percentage_error as MAPE
+from sklearn.metrics import mean_absolute_percentage_error as MAPE, mean_absolute_error as MAE
 from nodes import create_function_from_gene
 from argparse import ArgumentParser
 from typing import Callable
@@ -26,13 +26,12 @@ class Problem:
         function = create_function_from_gene(gene) 
         
         y_hat = np.array([function(x) for x in self.X])
-
         return -self.eval_func(self.y, y_hat)
     
     
 class ToyProblem(Problem):
-    def __init__(self, eval_func: Callable = MAPE, seed = 42):
-        X, y = make_regression(n_samples = 100, random_state = seed)
+    def __init__(self, eval_func: Callable = MAE, seed = 42):
+        X, y = make_regression(n_samples = 100, n_features= 10, random_state = seed)
         super().__init__(X, y, eval_func)
         
     

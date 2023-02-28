@@ -42,9 +42,17 @@ class Operator:
         N, _, D = offspring.shape
 
         # create random variable
+        r = np.random.rand(N, 1 , 1)
+        
+        # mutate with p=1/D
+        index = r < 10000000 / float(N)
+        index = np.repeat(index, 4, axis = 1)
+        index = np.repeat(index, D, axis = 2)
+        
         r = np.random.rand(*list(offspring.shape))
         # mutate with p=1/D
-        index = r < 1.0 / float(D)
+        index = (r < 1.0 / float(D)) | index
+        
         
         offspring[index] = np.random.randint(
             low=self.lb, high=self.ub, size=offspring.shape

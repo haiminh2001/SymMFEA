@@ -1,14 +1,15 @@
 from argparse import ArgumentParser
 import numpy as np
 from .operator import Operator, MultiObjectiveOperator
-from nodes import NODES
+from nodes import NODES, MAX_OPERANDS
 from problem import Problem
 from tqdm.auto import tqdm
 
 class Optimizer:
     def __init__(self, args):
-        self.head_length: int = args.num_operators
+        
         self.tail_length: int = args.num_operands
+        self.head_length: int = int(args.num_operands / (MAX_OPERANDS - 1)) + 1
         self.D: int = self.head_length + self.tail_length
         self.N: int = args.popsize
         self.T: int = args.num_iter
@@ -21,8 +22,8 @@ class Optimizer:
         ub = np.stack(( 
                       np.full(self.D, len(NODES) - 1),
                       np.full(self.D, problem.num_decision_variables - 1),
-                      np.full(self.D, 100), 
-                      np.full(self.D, 100), 
+                      np.full(self.D, 5), 
+                      np.full(self.D, 5), 
                       ))
         
         
@@ -30,7 +31,7 @@ class Optimizer:
         ub[0, self.head_length : self.D] = 1
         
         lb = np.concatenate((np.zeros((2, self.D)),
-                       np.full((2,self.D), -100)
+                       np.full((2,self.D), -5)
                        ))
         #root must be operator
         lb[0, 0] = 1
@@ -46,9 +47,10 @@ class Optimizer:
         # first evaluation
         
         fitness = [problem.evaluate(population[i, :, :]) for i in range(self.N)]
-        start_generation = 1
+        start_generation = 0
 
         with tqdm(range(start_generation, self.T)) as pbar: 
+            pbar.set_description('Initializing....')
             for t in pbar:
                 
                 # reproduction
@@ -59,7 +61,7 @@ class Optimizer:
                 offspring_fitness = [
                     problem.evaluate(offspring[i, :], is_print = t > 25) for i in range(self.N)
                 ]
-                pbar.set_description(f"GENERATION: {t} / {self.T} -- {np.max(fitness)}")
+                pbar.set_description(f"GENERATION: {t + 1} / {self.T} --Best: {np.max(fitness)}")
                 
 
                 # selection
@@ -68,8 +70,6 @@ class Optimizer:
                 )
                     
 
-                # # save checkpoint
-                # Optimizer.save_checkpoint(t, population, fitness, self.save_dict_path)
 
         # output
         if return_best:
