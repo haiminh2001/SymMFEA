@@ -16,13 +16,21 @@ class Optimizer:
     def ga(self, problem: Problem, return_best=True):
         #lb, ub is 2 list with same length as chromosome (D), indicating value range of each node 
         
- 
-        ub = np.stack((np.full(self.D, len(NODES) - 1),
-                      np.full(self.D, problem.num_decision_variables - 1)))
+        
+        ub = np.stack(( 
+                      np.full(self.D, len(NODES) - 1),
+                      np.full(self.D, problem.num_decision_variables - 1),
+                      np.full(self.D, 10), 
+                      np.full(self.D, 10), 
+                      ))
+        
+        
         #tail must contain only operands
         ub[0, self.head_length : self.D] = 1
         
-        lb = np.zeros((2, self.D))
+        lb = np.concatenate((np.zeros((2, self.D)),
+                       np.full((2,self.D), -100)
+                       ))
         #root must be operator
         lb[0, 0] = 1
         
@@ -33,7 +41,7 @@ class Optimizer:
         # if not os.path.exists(self.save_dict_path):
             # initialization
            
-        population = np.random.randint(low=lb, high=ub, size=(self.N, 2, self.D))
+        population = np.random.randint(low=lb, high=ub, size=(self.N, 4, self.D))
         # first evaluation
         
         fitness = [problem.evaluate(population[i, :, :]) for i in range(self.N)]
@@ -48,7 +56,7 @@ class Optimizer:
 
             # evaluation on offspring
             offspring_fitness = [
-                problem.evaluate(offspring[i, :]) for i in range(self.N)
+                problem.evaluate(offspring[i, :], is_print = t > 25) for i in range(self.N)
             ]
             print(np.max(offspring_fitness), np.max(fitness))
 

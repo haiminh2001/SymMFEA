@@ -25,7 +25,7 @@ def create_function_from_gene(gene: np.ndarray):
                 
                 #if is operand
                 if node_type == 0:
-                    node = get_node(node_type)(index = gene[1, idx])
+                    node = get_node(node_type)(index = gene[1, idx], weight = gene[2, gene[1, idx]], bias = gene[3, gene[1, idx]])
                 
                 #if is operator
                 else:
