@@ -19,15 +19,19 @@ class Operator:
         # select for crossover
         parent1 = population[np.random.permutation(N), :]
         parent2 = population[np.random.permutation(N), :]
-        offspring = np.zeros([N, 4, D])
+        offspring = np.empty([N, 4, D])
 
         # create random variable
-        r = np.random.rand(N, 4, D)
+        r = np.random.rand(N, 1, D)
 
         # uniform crossover
         index = r >= 0.5
+        index = np.repeat(index, 4, axis = 1)
+        
         offspring[index] = parent1[index]
-        index = r < 0.5
+        
+        
+        index = ~index
         offspring[index] = parent2[index]
 
         return offspring.astype(np.int32)

@@ -3,6 +3,7 @@ import numpy as np
 from .operator import Operator, MultiObjectiveOperator
 from nodes import NODES
 from problem import Problem
+from tqdm.auto import tqdm
 
 class Optimizer:
     def __init__(self, args):
@@ -20,8 +21,8 @@ class Optimizer:
         ub = np.stack(( 
                       np.full(self.D, len(NODES) - 1),
                       np.full(self.D, problem.num_decision_variables - 1),
-                      np.full(self.D, 10), 
-                      np.full(self.D, 10), 
+                      np.full(self.D, 100), 
+                      np.full(self.D, 100), 
                       ))
         
         
@@ -47,27 +48,28 @@ class Optimizer:
         fitness = [problem.evaluate(population[i, :, :]) for i in range(self.N)]
         start_generation = 1
 
+        with tqdm(range(start_generation, self.T)) as pbar: 
+            for t in pbar:
+                
+                # reproduction
+                offspring = self.operator.uniform_crossover(population)
+                offspring = self.operator.mutate(offspring)
 
-        for t in range(start_generation, self.T):
-            print(f"\nGENERATION: {t}\n")
-            # reproduction
-            offspring = self.operator.uniform_crossover(population)
-            offspring = self.operator.mutate(offspring)
-
-            # evaluation on offspring
-            offspring_fitness = [
-                problem.evaluate(offspring[i, :], is_print = t > 25) for i in range(self.N)
-            ]
-            print(np.max(offspring_fitness), np.max(fitness))
-
-            # selection
-            population, fitness = self.operator.select(
-                population, fitness, offspring, offspring_fitness
-            )
+                # evaluation on offspring
+                offspring_fitness = [
+                    problem.evaluate(offspring[i, :], is_print = t > 25) for i in range(self.N)
+                ]
+                pbar.set_description(f"GENERATION: {t} / {self.T} -- {np.max(fitness)}")
                 
 
-            # # save checkpoint
-            # Optimizer.save_checkpoint(t, population, fitness, self.save_dict_path)
+                # selection
+                population, fitness = self.operator.select(
+                    population, fitness, offspring, offspring_fitness
+                )
+                    
+
+                # # save checkpoint
+                # Optimizer.save_checkpoint(t, population, fitness, self.save_dict_path)
 
         # output
         if return_best:
